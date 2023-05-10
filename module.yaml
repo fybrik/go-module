@@ -1,0 +1,32 @@
+apiVersion: app.fybrik.io/v1beta1
+kind: FybrikModule
+metadata:
+  name: go-module-server
+  labels:
+    name: go-module-server
+    version: latest # semantic version
+spec:
+  type: service
+  chart:
+    name: ghcr.io/aradhalevy/go-module-chart:0.0.0
+    values:
+      image.tag: master
+  capabilities:
+    - capability: read
+      scope: workload
+      api:
+        connection:
+          name: fybrik-go
+          fybrik-go:
+            hostname: "{{ .Release.Name }}.{{ .Release.Namespace }}"
+            port: 80
+            scheme: http
+      supportedInterfaces:
+        - source:
+            protocol: s3
+            dataformat: parquet
+        - source:
+            protocol: s3
+            dataformat: csv
+        - source:
+            protocol: fybrik-go

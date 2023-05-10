@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "go-module-server.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "go-module-server.name" . }}
+    helm.sh/chart: {{ include "go-module-server.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "go-module-server.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "go-module-server.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        {{- range $key, $val := .Values.labels }}
+        {{ $key }}: {{ $val | quote }}
+        {{- end }}    
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      serviceAccountName: {{ include "go-module-server.fullname" . }}
+      securityContext:
+        {{- include "fybrik.processPodSecurityContext" (dict "context" . "podSecurityContext" .Values.podSecurityContext) | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          {{- if .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- end }}
+          ports:
+            - name: grpc
+              containerPort: 8080
+              protocol: TCP
+          securityContext:
+          {{- .Values.containerSecurityContext | toYaml | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: DATA_DIR
+              value: {{ include "fybrik.getDataDir" . }}
+            - name: MIN_TLS_VERSION
+              value:  {{ .Values.tls.minVersion }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ include "fybrik.getDataDir" . }}
+            - readOnly: true
+              mountPath: /etc/conf
+              name: config
+            {{- if .Values.tls.certs.certSecretName }}
+            - mountPath: {{ include "fybrik.getDataSubdir" ( tuple "tls-cert" ) }}
+              name: tls-cert
+              readOnly: true
+            {{- end }}
+            {{- if .Values.tls.certs.cacertSecretName }}
+            - mountPath: {{ include "fybrik.getDataSubdir" ( tuple "tls-cacert" ) }}
+              name: tls-cacert
+              readOnly: true
+            {{- end }}
+      volumes:
+        - name: data
+          emptyDir:
+            sizeLimit: {{ .Values.dataDirSizeLimit }}
+        - name: config
+          configMap:
+            name: {{ include "go-module-server.fullname" . }}
+        {{- if .Values.tls.certs.certSecretName }}
+        - name: tls-cert
+          secret:
+            defaultMode: 420
+            secretName: {{ .Values.tls.certs.certSecretName }}
+        {{- end }}
+        {{- if .Values.tls.certs.cacertSecretName }}
+        - name: tls-cacert
+          secret:
+            defaultMode: 420
+            secretName: {{ .Values.tls.certs.cacertSecretName }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
