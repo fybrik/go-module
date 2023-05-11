@@ -26,7 +26,7 @@ To install the module, download the `module.yaml` from the repository and run:
 kubectl apply -f module.yaml -n fybrik-system
 ```
 
-### Register a data asset
+### Prepare a data asset and register it in a data catalog
 
 First, you should create a new Kubernetes namespace and set it as the active namespace: 
 
@@ -34,8 +34,6 @@ First, you should create a new Kubernetes namespace and set it as the active nam
 kubectl create namespace fybrik-notebook-sample
 kubectl config set-context --current --namespace=fybrik-notebook-sample
 ```
-
-### Prepare a data asset and register it in a data catalog
 
 This example uses a sample of 100 lines of the [Synthetic Financial Datasets For Fraud Detection](https://www.kaggle.com/ealaxi/paysim1) dataset. Download [`PS_20174392719_1491204439457_log.csv`](https://raw.githubusercontent.com/fybrik/fybrik/master/samples/notebook/PS_20174392719_1491204439457_log.csv) from GitHub. 
 
@@ -80,8 +78,7 @@ In this step you are performing the role of the data owner, registering his data
 We now explain how to register a dataset in the Katalog data catalog.
 
 Begin by registering the credentials required for accessing the dataset as a kubernetes secret. Replace the values for `access_key` and `secret_key` with the values from the object storage service that you used and run:
-
-    ```yaml
+    ```bash
     cat << EOF | kubectl apply -f -
     apiVersion: v1
     kind: Secret
@@ -96,6 +93,7 @@ Begin by registering the credentials required for accessing the dataset as a kub
 
 Next, register the data asset itself in the data catalog.
 We use port-forwarding to send asset creation requests to the Katalog connector.
+
     ```bash
     cat << EOF | kubectl apply -f -
     apiVersion: katalog.fybrik.io/v1alpha1
