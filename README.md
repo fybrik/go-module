@@ -78,46 +78,47 @@ In this step you are performing the role of the data owner, registering his data
 We now explain how to register a dataset in the Katalog data catalog.
 
 Begin by registering the credentials required for accessing the dataset as a kubernetes secret. Replace the values for `access_key` and `secret_key` with the values from the object storage service that you used and run:
-    ```bash
-    cat << EOF | kubectl apply -f -
-    apiVersion: v1
-    kind: Secret
-    metadata:
-      name: paysim-csv
-    type: Opaque
-    stringData:
-      access_key: "${ACCESS_KEY}"
-      secret_key: "${SECRET_KEY}"
-    EOF
-    ```
+
+```bash
+cat << EOF | kubectl apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+    name: paysim-csv
+type: Opaque
+stringData:
+    access_key: "${ACCESS_KEY}"
+    secret_key: "${SECRET_KEY}"
+EOF
+```
 
 Next, register the data asset itself in the data catalog.
 We use port-forwarding to send asset creation requests to the Katalog connector.
 
-    ```bash
-    cat << EOF | kubectl apply -f -
-    apiVersion: katalog.fybrik.io/v1alpha1
-    kind: Asset
-    metadata:
-      name: paysim-csv
-    spec:
-      secretRef:
-        name: paysim-csv
-      details:
-        dataFormat: csv
-        connection:
-          name: s3
-          s3:
-            endpoint: "http://localstack.fybrik-notebook-sample.svc.cluster.local:4566"
-            bucket: "demo"
-            object_key: "PS_20174392719_1491204439457_log.csv"
-      metadata:
-        name: Synthetic Financial Datasets For Fraud Detection
-        geography: theshire
-        tags:
-          finance: true
-    EOF
-    ```
+```bash
+cat << EOF | kubectl apply -f -
+apiVersion: katalog.fybrik.io/v1alpha1
+kind: Asset
+metadata:
+  name: paysim-csv
+spec:
+  secretRef: 
+    name: paysim-csv
+  details:
+    dataFormat: csv
+    connection:
+      name: s3
+      s3:
+        endpoint: "http://localstack.fybrik-notebook-sample.svc.cluster.local:4566"
+        bucket: "demo"
+        object_key: "PS_20174392719_1491204439457_log.csv"
+  metadata:
+    name: Synthetic Financial Datasets For Fraud Detection
+    geography: theshire 
+    tags:
+      finance: true
+EOF
+```
 
 ### Define data access policy
 
