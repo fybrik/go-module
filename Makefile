@@ -9,10 +9,6 @@ CHART_NAME ?= go-module-chart
 HELM_RELEASE ?= rel1-${DOCKER_NAME}
 HELM_TAG ?= 0.0.0
 
-FYBRIKAPPLICATION_NAME ?= my-notebook
-FYBRIKAPPLICATION_YAML ?= fybrikapplication.yaml
-FYBRIK_NAMESPACE ?= fybrik-notebook-sample
-
 
 IMG := ${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${DOCKER_TAG}
 
@@ -49,14 +45,4 @@ docker-build:
 .PHONY: docker-push 
 docker-push: docker-build
 	docker push ${IMG}
-
-.PHONY: run-fybrikapp 
-run-fybrikapp:
-	-kubectl delete fybrikapplication ${FYBRIKAPPLICATION_NAME} -n ${FYBRIK_NAMESPACE}
-	kubectl apply -f ${FYBRIKAPPLICATION_YAML} -n ${FYBRIK_NAMESPACE}
-
-.PHONY: module-logs 
-module-logs :
-	FIRST_POD=$$(kubectl get pods -n fybrik-blueprints -o jsonpath='{.items[0].metadata.name}'); \
-	kubectl logs  $$FIRST_POD -n fybrik-blueprints;
 

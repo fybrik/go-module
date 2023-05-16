@@ -9,9 +9,8 @@ To see the Go module for Fybrik in action, you need to take these steps:
 1. Install Fybrik
 2. Register the Go-module to Fybrik
 3. Prepare a data asset and register it in a data catalog
-4. Define data access policy
-5. Deploy a Fybrik application
-6. Access the data asset using the Go-module 
+4. Deploy a Fybrik application
+5. Access the data asset using the Go-module 
 
 ### Install fybrik
 Install Fybrik v1.3 using the [Quick Start](https://fybrik.io/v1.3/get-started/quickstart/), without the section of `Install modules`, and make sure to install Fybrik with Katalog as the data catalog.
@@ -20,10 +19,10 @@ Install Fybrik v1.3 using the [Quick Start](https://fybrik.io/v1.3/get-started/q
 
 To register The Go-module as a Fybrik module apply `module.yaml` to the fybrik-system namespace of your cluster.
 
-To install the module, download the `module.yaml` from the repository and run:
+To install the module:
 
 ```bash
-kubectl apply -f module.yaml -n fybrik-system
+kubectl apply -f https://raw.githubusercontent.com/aradhalevy/go-module/go-module-setup/module.yaml -n fybrik-system
 ```
 
 ### Prepare a data asset and register it in a data catalog
@@ -118,22 +117,6 @@ We use port-forwarding to send asset creation requests to the Katalog connector.
           finance: true
     EOF
     ```
-
-### Define data access policy
-
-Acting as the data steward, define an [OpenPolicyAgent](https://www.openpolicyagent.org/). In this example we just access the data asset without redacting columns. Below is the policy (written in [Rego](https://www.openpolicyagent.org/docs/latest/policy-language/#what-is-rego) language):
-
-```rego
-package dataapi.authz
-rule[{}] { true }
-```
-In this sample only the policy above is applied. Copy the policy to a file named `sample-policy.rego` and then run:
-
-```bash
-kubectl -n fybrik-system create configmap sample-policy --from-file=sample-policy.rego
-kubectl -n fybrik-system label configmap sample-policy openpolicyagent.org/policy=rego
-while [[ $(kubectl get cm sample-policy -n fybrik-system -o 'jsonpath={.metadata.annotations.openpolicyagent\.org/policy-status}') != '{"status":"ok"}' ]]; do echo "waiting for policy to be applied" && sleep 5; done
-```
 
 ### Deploy a Fybrik application
 

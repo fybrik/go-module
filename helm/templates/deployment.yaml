@@ -34,7 +34,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- end }}
           ports:
-            - name: grpc
+            - name: http
               containerPort: 8080
               protocol: TCP
           securityContext:
