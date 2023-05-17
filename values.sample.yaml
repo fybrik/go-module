@@ -18,4 +18,3 @@ assets:
         secretPath: /v1/kubernetes-secrets/data-creds?namespace=fybrik-notebook-sample
   assetID: "test1"
   capability: read
-  
