@@ -8,6 +8,8 @@ CHART_LOCAL_PATH ?= helm
 CHART_NAME ?= go-module-chart
 HELM_RELEASE ?= rel1-${DOCKER_NAME}
 HELM_TAG ?= 0.0.0
+HELM_VALUES ?= \
+	--set hello=world1
 
 
 IMG := ${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${DOCKER_TAG}

@@ -24,9 +24,4 @@ spec:
       supportedInterfaces:
         - source:
             protocol: s3
-            dataformat: parquet
-        - source:
-            protocol: s3
-            dataformat: csv
-        - source:
-            protocol: fybrik-go
+
