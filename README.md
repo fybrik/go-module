@@ -140,6 +140,7 @@ spec:
     intent: Fraud Detection
   data:
     - dataSetID: "fybrik-notebook-sample/paysim-csv"
+      flow: read
       requirements:
         interface: 
           protocol: fybrik-go

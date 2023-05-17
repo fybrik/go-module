@@ -1,0 +1,21 @@
+labels:
+  app.fybrik.io/app-name: fybrik-flight-read
+uuid: 12345678
+assets:
+- args:
+  - connection:
+      name: s3
+      s3:
+        bucket: fybrik-test-bucket
+        endpoint: s3.eu-gb.cloud-object-storage.appdomain.cloud
+        object_key: test1.parquet
+    format: parquet
+    vault:
+      read:
+        address: http://vault.fybrik-system:8200
+        authPath: /v1/auth/kubernetes/login
+        role: module
+        secretPath: /v1/kubernetes-secrets/data-creds?namespace=fybrik-notebook-sample
+  assetID: "test1"
+  capability: read
+  
