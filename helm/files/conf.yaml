@@ -1,0 +1,39 @@
+{{ if .Values.assets -}}
+data:
+{{- range $asset := .Values.assets }}
+  - name: {{ $asset.assetID | quote }}
+    capability: {{ $asset.capability }}
+    {{- if and (.args) (eq (len .args) 1) -}}
+    {{- with (index .args 0) }}
+    format: {{ .format | quote }}
+    {{- if index . "connection" "s3" }}
+    connection:
+      type: s3
+      s3:
+        bucket: {{ .connection.s3.bucket }}
+        object_key: {{ .connection.s3.object_key }}
+        endpoint_url: {{trimPrefix "http://" .connection.s3.endpoint}}
+        {{- range $k, $v := .vault }}
+        {{- if or (eq $k "read") (eq $k "write") }}
+        vault_credentials:
+          {{- if $v.address }}
+          address: {{ $v.address }}
+          {{- end }}
+          {{- if $v.authPath }}
+          authPath: {{ $v.authPath }}
+          {{- end }}
+          {{- if $v.role }}
+          role: {{ $v.role }}
+          {{- end }}
+          {{- if $v.secretPath }}
+          secretPath: {{ $v.secretPath }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+{{- end -}}
+{{- else -}}
+data: []
+{{- end -}}

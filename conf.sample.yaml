@@ -1,0 +1,14 @@
+
+data:
+- name: "fybrik-notebook-sample/paysim-csv"
+  capability: read
+  format: "csv"
+  connection:
+    type: s3
+    s3:
+      endpoint_url: http://localstack.fybrik-notebook-sample.svc.cluster.local:4566
+      vault_credentials:
+        address: http://vault.fybrik-system:8200
+        authPath: /v1/auth/kubernetes/login
+        role: module
+        secretPath: /v1/kubernetes-secrets/paysim-csv?namespace=fybrik-notebook-sample
